@@ -1,0 +1,25 @@
+{
+  "name": "dengsn/webuntis",
+  "description": "Object-oriented layer for the WebUntis JSON-RPC backend",
+  "authors": [
+    {
+      "name": "dengsn",
+      "email": "info@dengsn.com"
+    }
+  ],
+  "license": "GPL-3.0+",
+  "require": {
+    "php": "^7.2",
+    "ext-ds": "^1.0",
+    "php-di/php-di": "~6.0",
+    "vaderangry/php-json-rpc": "~1.2",
+    "dengsn/snake": "~1.1",
+    "dengsn/vanillaquery": "~1.0",
+    "eluceo/ical": "~0.14"
+  },
+  "autoload": {
+    "psr-4": {
+      "WebUntis\\": "src/"
+    }
+  }
+}

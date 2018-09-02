@@ -8,8 +8,6 @@ use Snake\Extractor\ExtractorInterface;
 use Snake\Hydrator\HydratorInterface;
 use WebUntis\Factory\{ExtractorFactory, HydratorFactory};
 use WebUntis\Model\{Department, Group, Holiday, Room, Subject, Timeslot, Year};
-use WebUntis\Provider\{ClientProvider, ExtractorProvider, HydratorProvider};
-use WebUntis\Timetable\Timetable;
 
 use function DI\{autowire, factory, get, value};
 
@@ -72,10 +70,17 @@ class WebUntis
         ->parameter('method','getRooms')
         ->parameter('objectClass',Room::class),
 
-      /*// Timetable service
-      'timetable' => function() {
-
-      },*/
+      // Timetable service
+      'timetable' => function(ContainerInterface $c) {
+        return function(Group $group, \DateTime $startDate, \DateTime $endDate) use ($c) {
+          return $c->get('client')->fetch(Timeslot::class,'getTimetable',[
+            'startDate' => ExtractorFactory::formatDate($startDate),
+            'endDate' => ExtractorFactory::formatDate($endDate),
+            'id' => $group->id,
+            'type' => Timetable::TYPE_GROUP
+          ],Timetable::class);
+        };
+      },
 
       // Helper services
       'lastModified' => factory([Client::class,'getLastUpdated']),

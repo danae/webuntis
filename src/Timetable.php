@@ -7,8 +7,15 @@ use Snake\Extractor\CustomExtractInterface;
 use Snake\Extractor\ExtractorInterface;
 use WebUntis\Model\Timeslot;
 
-class Timetable implements CustomExtractInterface
+class Timetable
 {
+  // Constrants
+  const TYPE_GROUP = 1;
+  const TYPE_TEACHER = 2;
+  const TYPE_SUBJECT = 3;
+  const TYPE_ROOM = 4;
+  const TYPE_STUDENT = 5;
+
   // Variables
   private $map;
 
@@ -50,14 +57,6 @@ class Timetable implements CustomExtractInterface
   public function __call(string $method, array $args)
   {
     return call_user_func_array([$this->map,$method],$args);
-  }
-
-  // Convert to array
-  public function extract(ExtractorInterface $extractor, array $context)
-  {
-    return [
-      'timeslots' => $this->values()->toArray()
-    ];
   }
 
   // Convert to VCalendar

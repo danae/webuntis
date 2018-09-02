@@ -9,18 +9,11 @@ use WebUntis\Provider\HydratorProvider;
 
 class Timeslot implements CustomHydrateInterface
 {
-  // Constrants
-  const TYPE_GROUP = 1;
-  const TYPE_TEACHER = 2;
-  const TYPE_SUBJECT = 3;
-  const TYPE_ROOM = 4;
-  const TYPE_STUDENT = 5;
-
   // Variables
   public $id;
   public $startTime;
   public $endTime;
-  public $classes;
+  public $groups;
   public $subjects;
   public $rooms;
 
@@ -36,17 +29,17 @@ class Timeslot implements CustomHydrateInterface
     $merged->id = $this->id;
     $merged->startTime = $this->startTime;
     $merged->endTime = $other->endTime;
-    $merged->classes = $this->classes;
+    $merged->groups = $this->groups;
     $merged->subjects = $this->subjects;
     $merged->rooms = $this->rooms;
     return $merged;
   }
 
   // Return if this timetable can be appended with another timetable
-  public function isAppendable(TimetableModel $other): bool
+  public function isAppendable(self $other): bool
   {
     return $other->startTime->getTimestamp() - $this->endTime->getTimestamp() <= 900
-      && $this->classes == $other->classes
+      && $this->groups == $other->groups
       && $this->subjects == $other->subjects
       && $this->rooms == $other->rooms;
   }
@@ -60,22 +53,19 @@ class Timeslot implements CustomHydrateInterface
     if (!is_a($webuntis,Webuntis::class))
       throw new InvalidArgumentException("No database is defined");
 
-    // Get the school year for this schedule
-    $year = $webuntis['inYear']($array['startTime']);
-
     // Get the groups
-    $groups = array_map(function($classId) use ($webuntis, $year) {
-      return $webuntis['groups']($year)[$classId];
+    $groups = array_map(function($groupId) use ($webuntis) {
+      return $webuntis->groups[$groupId];
     },array_column($array['kl'],'id'));
 
     // Get the subjects
     $subjects = array_map(function($subjectId) use ($webuntis) {
-      return $webuntis['subjects'][$subjectId];
+      return $webuntis->subjects[$subjectId];
     },array_column($array['su'],'id'));
 
     // Get the rooms
     $rooms = array_map(function($roomId) use ($webuntis) {
-      return $webuntis['rooms'][$roomId];
+      return $webuntis->rooms[$roomId];
     },array_column($array['ro'],'id'));
 
     // Return the timetable
